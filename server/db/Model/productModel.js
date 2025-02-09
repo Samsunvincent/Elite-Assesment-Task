@@ -1,9 +1,15 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify'); 
 
 const productSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true
+    },
+    slug: {
+        type: String,
+        required: true,
+        unique: true 
     },
     description: {
         type: String,
@@ -37,7 +43,32 @@ const productSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
+   
+    newPrice : {
+        type : Number,
+        required : true
+    },
+    freeDelivery: {
+        type: String,
+        enum: ['Yes', 'No'],
+        required : true
+    }
+    
 }, { timestamps: true });
 
+productSchema.pre('save', async function (next) {
+    if (!this.isModified('title')) return next();
+
+    let slug = slugify(this.title, { lower: true });
+    let existingProduct = await mongoose.model('Product').findOne({ slug });
+
+
+    if (existingProduct) {
+        slug = `${slug}-${Date.now()}`;
+    }
+
+    this.slug = slug;
+    next();
+});
 
 module.exports = mongoose.model('Product', productSchema);

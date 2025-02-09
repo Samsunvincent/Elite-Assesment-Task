@@ -17,5 +17,6 @@ Router.post('/signUp', userController.createUser)
 Router.post('/signUp/Vendor', userController.createUser)
 Router.post('/signUp/Staff',setAccessControl("4"),userController.createUser);
 Router.post('/addProduct',setAccessControl('1,2,4'),upload,userController.addProduct)
+Router.get('/getAllProducts',setAccessControl("*"),userController.getAllProducts)
 
 module.exports = Router;
